@@ -76,9 +76,9 @@ cdef class Registry:
 
 
 cdef class System:
-    cdef Registry registry
+    cdef public Registry registry
 
-    def __cinit__(self, Registry registry):
+    def __init__(self, Registry registry=None):
         self.registry = registry
 
     def process(self, dt):
@@ -86,3 +86,28 @@ cdef class System:
 
     def init(self):
         raise NotImplementedError
+
+
+cdef class SystemManager:
+    cdef:
+        list systems
+        public Registry registry
+
+    def __init__(self, Registry registry=None):
+        if registry is None:
+            registry = Registry()
+        self.registry = registry
+        self.systems = []
+
+    def add_system(self, type_or_component system):
+        if type_or_component is type:
+            _system = system(self.registry)
+        else:
+            system.registry = self.registry
+            _system = system
+        self.systems.append(_system)
+        _system.init()
+
+    def process(self, dt):
+        for system in self.systems:
+            system.process(dt)

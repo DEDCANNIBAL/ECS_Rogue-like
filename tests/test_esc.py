@@ -4,7 +4,7 @@ import ecs
 from tests.components import Health, Point
 
 
-class TestEscpp(unittest.TestCase):
+class TestRegistry(unittest.TestCase):
     def setUp(self) -> None:
         self.registry = ecs.Registry()
 
@@ -66,3 +66,40 @@ class TestEscpp(unittest.TestCase):
             {tuple(row) for row in self.registry.view(Health, Point)},
             {(entity, hp, point)}
         )
+
+
+class TestSystemManager(unittest.TestCase):
+    def setUp(self) -> None:
+        self.registry = ecs.Registry()
+        self.manager = ecs.SystemManager(self.registry)
+        self.system = TestSystem()
+
+    def test_init_default(self):
+        manager = ecs.SystemManager()
+        self.assertIsInstance(manager.registry, ecs.Registry)
+
+    def test_add_system_instance(self):
+        self.manager.add_system(self.system)
+        self.assertIs(self.system.registry, self.registry)
+        self.assertTrue(self.system.initialized)
+
+    def test_add_system(self):
+        self.manager.add_system(TestSystem)
+
+    def test_process(self):
+        self.manager.add_system(self.system)
+        self.manager.process(1)
+        self.assertTrue(self.system.processed)
+
+
+class TestSystem(ecs.System):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.initialized = False
+        self.processed = False
+
+    def process(self, dt):
+        self.processed = True
+
+    def init(self):
+        self.initialized = True
