@@ -15,23 +15,36 @@ class TestEscpp(unittest.TestCase):
 
     def test_create_default(self):
         entity = self.registry.create(Health)
-        self.assertIsInstance(self.registry.get(entity, Health)[0], Health)
+        self.assertIsInstance(self.registry.get(entity, Health), Health)
 
     def test_create(self):
         point = Point(3, 4)
         entity = self.registry.create(point)
-        self.assertIs(self.registry.get(entity, Point)[0], point)
+        self.assertIs(self.registry.get(entity, Point), point)
 
     def test_assign_default(self):
         entity = self.registry.create()
         self.registry.assign(entity, Health)
-        self.assertIsInstance(self.registry.get(entity, Health)[0], Health)
+        self.assertIsInstance(self.registry.get(entity, Health), Health)
+
+    def test_assign_with_args(self):
+        entity = self.registry.create()
+        self.registry.assign(entity, Point, 3, 4)
+        self.assertEqual(self.registry.get(entity, Point), Point(3, 4))
 
     def test_assign(self):
         entity = self.registry.create()
         point = Point(3, 4)
         self.registry.assign(entity, point)
-        self.assertIs(self.registry.get(entity, Point)[0], point)
+        self.assertIs(self.registry.get(entity, Point), point)
+
+    def test_get_few(self):
+        hp, point = Health(), Point()
+        entity = self.registry.create(point, hp)
+        self.assertEqual(
+            tuple(self.registry.get(entity, Point, Health)),
+            (point, hp)
+        )
 
     def test_view_one(self):
         hp1, hp2, point = Health(), Health(), Point()

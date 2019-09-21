@@ -1,6 +1,4 @@
-from functools import lru_cache
-from typing import Any
-
+#cython: language_level=3
 import cython
 
 
@@ -18,7 +16,7 @@ ctypedef fused type_or_component:
     object
 
 cdef class Registry:
-    cdef :
+    cdef:
         int counter
         public defaultdict components
 
@@ -30,17 +28,27 @@ cdef class Registry:
         cdef int entity = self.counter
         self.counter += 1
         for component in components:
-            self.assign(entity, component)
+            self.assign_object(entity, component)
         return entity
 
-    cpdef assign(self, int entity, component):
+    cpdef assign_object(self, int entity, component):
         if isinstance(component, type):
             self.components[component][entity] = component()
         else:
             self.components[type(component)][entity] = component
 
+    def assign(self, int entity, type_or_component component, *args):
+        if type_or_component is type:
+            self.components[component][entity] = component(*args)
+        else:
+            self.components[type(component)][entity] = component
+
     def get(self, int entity, *components):
-        return [self.components[component].get(entity) for component in components]
+        return (
+            [self.components[component].get(entity) for component in components]
+            if len(components) > 1 else
+            self.components[components[0]].get(entity)
+        )
 
     def view(self, *other_components):
         if len(other_components) == 1:
@@ -78,5 +86,3 @@ cdef class System:
 
     def init(self):
         raise NotImplementedError
-
-
