@@ -81,11 +81,11 @@ cdef class System:
     def __init__(self, Registry registry=None):
         self.registry = registry
 
-    def process(self, dt):
-        raise NotImplementedError
+    def process(self, float dt):
+        pass
 
     def init(self):
-        raise NotImplementedError
+        pass
 
 
 cdef class SystemManager:
@@ -108,6 +108,6 @@ cdef class SystemManager:
         self.systems.append(_system)
         _system.init()
 
-    def process(self, dt):
+    def process(self, float dt):
         for system in self.systems:
             system.process(dt)
