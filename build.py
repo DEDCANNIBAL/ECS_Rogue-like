@@ -2,5 +2,5 @@ from distutils.core import setup
 from Cython.Build import cythonize
 
 setup(
-    ext_modules=cythonize("ecs/ecs.pyx", annotate=True),
+    ext_modules=cythonize(["*/*.pyx", "*/*.pxd"], annotate=True),
 )

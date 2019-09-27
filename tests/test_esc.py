@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 import ecs
@@ -71,16 +72,19 @@ class TestRegistry(unittest.TestCase):
 class TestSystemManager(unittest.TestCase):
     def setUp(self) -> None:
         self.registry = ecs.Registry()
-        self.manager = ecs.SystemManager(self.registry)
+        self.pubsub = ecs.PubSub()
+        self.manager = ecs.SystemManager(pubsub=self.pubsub, registry=self.registry)
         self.system = TestSystem()
 
     def test_init_default(self):
         manager = ecs.SystemManager()
         self.assertIsInstance(manager.registry, ecs.Registry)
+        self.assertIsInstance(manager.pubsub, ecs.PubSub)
 
     def test_add_system_instance(self):
         self.manager.add_system(self.system)
         self.assertIs(self.system.registry, self.registry)
+        self.assertIsInstance(self.system.pubsub, ecs.PubSubView)
         self.assertTrue(self.system.initialized)
 
     def test_add_system(self):

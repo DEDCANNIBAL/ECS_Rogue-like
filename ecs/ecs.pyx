@@ -1,5 +1,8 @@
 #cython: language_level=3
+from abc import ABC
+
 import cython
+from ecs.pubsub cimport PubSub, PubSubView
 
 
 cdef class defaultdict(dict):
@@ -75,11 +78,14 @@ cdef class Registry:
         return len(self.components[component_type])
 
 
-cdef class System:
-    cdef public Registry registry
+cdef class System(ABC):
+    cdef:
+        public Registry registry
+        public PubSubView pubsub
 
-    def __init__(self, Registry registry=None):
+    def __init__(self, Registry registry=None, PubSub pubsub=None):
         self.registry = registry
+        self.pubsub = PubSubView(pubsub) if pubsub is not None else None
 
     def process(self, float dt):
         pass
@@ -92,18 +98,23 @@ cdef class SystemManager:
     cdef:
         list systems
         public Registry registry
+        public PubSub pubsub
 
-    def __init__(self, Registry registry=None):
+    def __init__(self, PubSub pubsub=None, Registry registry=None):
         if registry is None:
             registry = Registry()
+        if pubsub is None:
+            pubsub = PubSub()
         self.registry = registry
+        self.pubsub = pubsub
         self.systems = []
 
     def add_system(self, type_or_component system):
         if type_or_component is type:
-            _system = system(self.registry)
+            _system = system(self.registry, self.pubsub)
         else:
             system.registry = self.registry
+            system.pubsub = PubSubView(self.pubsub)
             _system = system
         self.systems.append(_system)
         _system.init()
