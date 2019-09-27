@@ -3,7 +3,7 @@ from pyglet import gl
 import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
-from ecs import SystemManager, Registry
+from ecs import SystemManager, Registry, PubSub
 from systems.debug_system import DebugSystem
 
 
@@ -17,7 +17,8 @@ def main():
     ui_clock = pyglet.clock.Clock()
 
     registry = Registry()
-    system_manager = make_system_manager(registry)
+    pubsub = PubSub()
+    system_manager = make_system_manager(pubsub=pubsub, registry=registry)
     pyglet.clock.schedule_interval(system_manager.process, 0.016)
 
     def update_ui(dt):
@@ -35,8 +36,8 @@ def main():
     impl.shutdown()
 
 
-def make_system_manager(registry):
-    system_manager = SystemManager(registry)
+def make_system_manager(pubsub, registry):
+    system_manager = SystemManager(pubsub=pubsub, registry=registry)
     system_manager.add_system(DebugSystem)
     return system_manager
 

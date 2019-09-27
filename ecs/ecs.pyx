@@ -1,7 +1,4 @@
 #cython: language_level=3
-from abc import ABC
-
-import cython
 from ecs.pubsub cimport PubSub, PubSubView
 
 
@@ -78,7 +75,7 @@ cdef class Registry:
         return len(self.components[component_type])
 
 
-cdef class System(ABC):
+cdef class System:
     cdef:
         public Registry registry
         public PubSubView pubsub
