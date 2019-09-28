@@ -33,6 +33,11 @@ class TestRegistry(unittest.TestCase):
         self.registry.assign(entity, Point, 3, 4)
         self.assertEqual(self.registry.get(entity, Point), Point(3, 4))
 
+    def test_assign_with_kwargs(self):
+        entity = self.registry.create()
+        self.registry.assign(entity, Point, x=3, y=4)
+        self.assertEqual(self.registry.get(entity, Point), Point(3, 4))
+
     def test_assign(self):
         entity = self.registry.create()
         point = Point(3, 4)

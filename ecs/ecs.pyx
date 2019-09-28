@@ -37,9 +37,9 @@ cdef class Registry:
         else:
             self.components[type(component)][entity] = component
 
-    def assign(self, int entity, type_or_component component, *args):
+    def assign(self, int entity, type_or_component component, *args, **kwargs):
         if type_or_component is type:
-            self.components[component][entity] = component(*args)
+            self.components[component][entity] = component(*args, **kwargs)
         else:
             self.components[type(component)][entity] = component
 
