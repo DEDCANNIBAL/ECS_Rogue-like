@@ -1,6 +1,6 @@
 import ecs
 
-from tests.components import Health, Point
+from test.ecs_tests.components import Health, Point
 
 N = 10000
 

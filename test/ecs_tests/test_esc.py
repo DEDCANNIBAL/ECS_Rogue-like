@@ -2,7 +2,7 @@ import sys
 import unittest
 
 import ecs
-from tests.components import Health, Point
+from .components import Health, Point
 
 
 class TestRegistry(unittest.TestCase):
