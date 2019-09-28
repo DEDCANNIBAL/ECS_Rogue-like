@@ -13,6 +13,9 @@ cdef class PubSub:
             self.queues[item] = queue
         return queue
 
+    def __getattr__(self, str item):
+        return self[item]
+
     cpdef clear(self):
         for queue in self.queues.values():
             queue.clear()
@@ -30,3 +33,5 @@ cdef class PubSubView:
             self.queues_views[item] = queue_view
         return queue_view
 
+    def __getattr__(self, str item):
+        return self[item]

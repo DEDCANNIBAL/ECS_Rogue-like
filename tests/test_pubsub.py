@@ -31,3 +31,7 @@ class TestEventQueue(unittest.TestCase):
         next(self.view1['queue1'])
         self.pubsub.clear()
         self.assertEqual(next(self.view2['queue1']), 2)
+
+    def test_getattr(self):
+        self.view1.queue1.append(1)
+        self.assertEqual(next(self.view2.queue1), 1)

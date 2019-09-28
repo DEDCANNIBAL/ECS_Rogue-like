@@ -74,6 +74,11 @@ cdef class Registry:
     cdef int count_components(self, type component_type):
         return len(self.components[component_type])
 
+    def delete(self, int entity):
+        for component in self.components.values():
+            if component.get(entity) is not None:
+                del component[entity]
+
 
 cdef class System:
     cdef:
