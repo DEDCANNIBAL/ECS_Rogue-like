@@ -27,3 +27,14 @@ class TestMakeTurnSystem(TestSystem):
             self.assertIs(self.registry.get(entity1, Actable).acted, not player_acted)
             self.assertFalse(self.registry.get(player, Actable).acted)
             self.assertFalse(self.registry.get(entity2, Actable).acted)
+
+    def test_event_appending(self):
+        self.system.non_player_turn = MagicMock()
+        entity = self.registry.create(Actable)
+        turn_number = self.system.turn_number
+        self.system.process(1)
+        self.assertEqual(next(self.pubsub_view.unit_turn), entity)
+        self.assertEqual(next(self.pubsub_view.turns), turn_number)
+        self.assertEqual(self.system.turn_number, turn_number + 1)
+
+
