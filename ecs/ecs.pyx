@@ -50,19 +50,18 @@ cdef class Registry:
             self.components[components[0]].get(entity)
         )
 
-    def view(self, *other_components):
-        if len(other_components) == 1:
-            yield from self.components[other_components[0]].items()
+    def view(self, *components):
+        if len(components) == 1:
+            yield from self.components[components[0]].items()
             return
-        min_component = min(other_components, key=lambda component_type: len(self.components[component_type]))
-        other_components = [component for component in other_components if component is not min_component]
+        min_component = min(components, key=lambda component_type: len(self.components[component_type]))
         for entity, first_component_instance in self.components[min_component].items():
-            result = self.get_other_components(other_components, entity, first_component_instance)
+            result = self.get_other_components(components, entity)
             if result is not None: yield result
 
-    cdef list get_other_components(self, list other_components, int entity, first_component_instance):
-        cdef list result = [entity, first_component_instance]
-        for component in other_components:
+    cdef list get_other_components(self, tuple components, int entity):
+        cdef list result = [entity]
+        for component in components:
             other_component_instance = self.components[component].get(entity)
             if other_component_instance is None:
                 return None

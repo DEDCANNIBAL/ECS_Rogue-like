@@ -73,6 +73,13 @@ class TestRegistry(unittest.TestCase):
             {(entity, hp, point)}
         )
 
+    def test_view_optimization(self):
+        self.registry.create(Health, Point)
+        self.registry.create(Health)
+        entity, hp, point = next(self.registry.view(Health, Point))
+        self.assertIsInstance(hp, Health)
+        self.assertIsInstance(point, Point)
+
     def test_delete(self):
         hp = Health()
         entity = self.registry.create(hp)
