@@ -1,6 +1,6 @@
 from operator import itemgetter
 
-from components import Actable
+from components import Actable, Action, Position
 from ecs import System
 
 
@@ -20,14 +20,20 @@ class MakeTurnSystem(System):
                 self.non_player_turn(entity)
                 actable.acted = True
             actable_components.append(actable)
-            self.pubsub.unit_turn.append(entity)
+            self.pubsub.unit_acted.append(entity)
         self.pubsub.turns.append(self.turn_number)
         for component in actable_components:
             component.acted = False
         self.turn_number += 1
 
     def non_player_turn(self, entity: int):
-        pass
+        action = self.registry.get(entity, Action)
+        if action is None:
+            return False
+        position = self.registry.get(entity, Position)
+        position += action.delta
+        self.registry.remove(entity, Action)
+        return True
 
     def player_turn(self, entity: int):
-        return True
+        return self.non_player_turn(entity)

@@ -77,8 +77,13 @@ class TestRegistry(unittest.TestCase):
         hp = Health()
         entity = self.registry.create(hp)
         self.registry.delete(entity)
-        self.assertEqual(self.registry.get(entity, Health), None)
+        self.assertIsNone(self.registry.get(entity, Health))
         self.assertEqual(sys.getrefcount(hp), 2)
+
+    def test_remove(self):
+        entity = self.registry.create(Health)
+        self.registry.remove(entity, Health)
+        self.assertIsNone(self.registry.get(entity, Health))
 
 
 class TestSystemManager(unittest.TestCase):

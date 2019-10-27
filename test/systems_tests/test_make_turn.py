@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from components import Actable
-from systems.make_turn_system import MakeTurnSystem
+from systems import MakeTurnSystem
 from .base import TestSystem
 
 
@@ -33,7 +33,7 @@ class TestMakeTurnSystem(TestSystem):
         entity = self.registry.create(Actable)
         turn_number = self.system.turn_number
         self.system.process(1)
-        self.assertEqual(next(self.pubsub_view.unit_turn), entity)
+        self.assertEqual(next(self.pubsub_view.unit_acted), entity)
         self.assertEqual(next(self.pubsub_view.turns), turn_number)
         self.assertEqual(self.system.turn_number, turn_number + 1)
 

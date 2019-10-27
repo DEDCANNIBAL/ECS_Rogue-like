@@ -3,8 +3,9 @@ from pyglet import gl
 import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
+import systems
+from components import Position
 from ecs import SystemManager, Registry, PubSub
-from systems.debug_system import DebugSystem
 
 
 def main():
@@ -21,6 +22,10 @@ def main():
     system_manager = make_system_manager(pubsub=pubsub, registry=registry)
     pyglet.clock.schedule_interval(system_manager.process, 0.016)
 
+    def clear_pubsub(dt):
+        pubsub.clear()
+    pyglet.clock.schedule_interval(clear_pubsub, 0.033)
+
     def update_ui(dt):
         imgui.new_frame()
 
@@ -32,13 +37,27 @@ def main():
         imgui.render()
         impl.render(imgui.get_draw_data())
 
+    @window.event
+    def on_mouse_release(x, y, button, modifiers):
+        pubsub.mouse_clicks.append(Position(x, y))
+
     pyglet.app.run()
     impl.shutdown()
 
 
 def make_system_manager(pubsub, registry):
     system_manager = SystemManager(pubsub=pubsub, registry=registry)
-    system_manager.add_system(DebugSystem)
+    for system in (
+        systems.ManagePlayerSystem,
+        systems.ManagePlayerSystem,
+        systems.MakeOrderSystem,
+        systems.MakePlayerGoalSystem,
+        systems.MakeActionSystem,
+        systems.MakeTurnSystem,
+        systems.DebugSystem,
+    ):
+        system_manager.add_system(system)
+
     return system_manager
 
 

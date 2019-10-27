@@ -74,6 +74,9 @@ cdef class Registry:
     cdef int count_components(self, type component_type):
         return len(self.components[component_type])
 
+    def remove(self, int entity, type component_type):
+        del self.components[component_type][entity]
+
     def delete(self, int entity):
         for component in self.components.values():
             if component.get(entity) is not None:
@@ -89,7 +92,7 @@ cdef class System:
         self.registry = registry
         self.pubsub = PubSubView(pubsub) if pubsub is not None else None
 
-    def process(self, float dt):
+    def process(self, dt: float = 0):
         pass
 
     def init(self):
