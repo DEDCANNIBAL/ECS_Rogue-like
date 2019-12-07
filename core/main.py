@@ -49,7 +49,6 @@ def make_system_manager(pubsub, registry):
     system_manager = SystemManager(pubsub=pubsub, registry=registry)
     for system in (
         systems.ManagePlayerSystem,
-        systems.ManagePlayerSystem,
         systems.MakeOrderSystem,
         systems.MakePlayerGoalSystem,
         systems.MakeActionSystem,
