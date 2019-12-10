@@ -4,6 +4,7 @@ from pyglet import gl
 import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
+import widgets
 from patterns import Pattern
 
 
@@ -13,7 +14,12 @@ def main():
     gl.glClearColor(1, 1, 1, 1)
     imgui.create_context()
     impl = PygletRenderer(window)
+    pyglet.resource.path.append('resources')
+
+
     patterns = PatternsManager()
+
+    add_pattern_button = widgets.Button('Add pattern', callback=None)
 
     def update(dt):
         imgui.new_frame()
@@ -32,7 +38,6 @@ def main():
         patterns.list()
 
         imgui.end()
-
 
     @window.event
     def on_draw():
@@ -59,10 +64,19 @@ class PatternsManager:
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
 
+    def delete_pattern(self, pattern):
+        self.patterns.remove(pattern)
+
     def list(self):
         imgui.begin_child('patterns')
+        imgui.separator()
         for pattern in self.patterns:
             imgui.button(pattern.name)
+            imgui.same_line()
+            texture_id = pyglet.resource.texture('cancel.png').id
+            print(texture_id)
+            if imgui.image_button(texture_id, 20, 20):
+                self.delete_pattern(pattern)
         imgui.end_child()
 
 
@@ -77,6 +91,7 @@ class AddPatternForm:
             cls.name = ''
             return name
         return None
+
 
 if __name__ == "__main__":
     main()
