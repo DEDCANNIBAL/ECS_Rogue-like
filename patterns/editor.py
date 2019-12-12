@@ -16,7 +16,6 @@ def main():
     impl = PygletRenderer(window)
     pyglet.resource.path.append('resources')
 
-
     patterns = PatternsManager()
 
     add_pattern_button = widgets.Button('Add pattern', callback=None)

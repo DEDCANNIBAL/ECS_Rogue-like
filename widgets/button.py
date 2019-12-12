@@ -3,7 +3,7 @@ from typing import Callable
 
 import imgui
 
-from widgets import Widget
+from widgets.base import Widget
 
 
 @dataclass
