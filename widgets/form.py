@@ -21,28 +21,35 @@ class Form(Widget):
 
     def __init__(self, fields: List[FormField], name: str = ''):
         self.name = name
+        self.form_fields = fields
         self.fields = {}
-        for field in fields:
+        self.init()
+
+    def init(self):
+        self.fields = {}
+        for field in self.form_fields:
             default = field.type() if field.default is None else field.default
             input_func = self.get_input_func(field)
             description = field.description or field.key
-            self.fields[field.key] = (default, input_func, description)
+            self.fields[field.key] = [default, input_func, description]
 
     @staticmethod
     def get_input_func(field: FormField):
-        if isinstance(field.type, str):
+        if field.type is str:
             return partial(imgui.input_text, buffer_length=256)
-        elif isinstance(field.type, int):
+        elif field.type is int:
             return imgui.input_int
-        elif isinstance(field.type, float):
+        elif field.type is float:
             return imgui.input_float
-        elif isinstance(field.type, ForeignKey):
+        elif field.type is ForeignKey:
             return partial(imgui.listbox, fitems=field.type.choices)
+        else:
+            raise NotImplementedError
 
     def gui(self):
         for key, (current, input_func, description) in self.fields.items():
-            current, changed = input_func(description, current)
-            self.fields[key] = current
+            changed, current = input_func(description, current)
+            self.fields[key][0] = current
 
     @property
     def context(self):

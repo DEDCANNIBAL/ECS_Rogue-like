@@ -21,7 +21,7 @@ cdef class vec2i:
         return type(self)(self.x - other.x, self.y - other.y)
 
     def __mul__(vec2i self, int other):
-        return self.__new__(self.x * other, self.y * other)
+        return type(self)(self.x * other, self.y * other)
 
     def __floordiv__(vec2i self, int other):
         return type(self)(self.x // other, self.y // other)

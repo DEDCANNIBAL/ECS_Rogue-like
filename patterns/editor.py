@@ -1,6 +1,7 @@
+from typing import List
+
 import pyglet
 from pyglet import gl
-
 import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
@@ -18,23 +19,26 @@ def main():
 
     patterns = PatternsManager()
 
-    add_pattern_button = widgets.Button('Add pattern', callback=None)
+    add_pattern_button = widgets.ButtonWithPopup(
+        'Add pattern',
+        popup=widgets.FormPopup(
+            'Add pattern',
+            form=widgets.Form(
+                [widgets.FormField(
+                    'name',
+                    str,
+                    description='Pattern name'
+                )]
+            ),
+            callback=patterns.add_pattern_from_form,
+        ),
+    )
 
     def update(dt):
         imgui.new_frame()
-
         imgui.begin('Patterns')
-
-        if imgui.button('Add pattern'):
-            imgui.open_popup("add-pattern")
-        if imgui.begin_popup('add-pattern'):
-            form = AddPatternForm.enter()
-            if form is not None:
-                imgui.close_current_popup()
-                patterns.add_pattern_from_form(form)
-            imgui.end_popup()
-
-        patterns.list()
+        add_pattern_button.gui()
+        patterns.gui()
 
         imgui.end()
 
@@ -52,44 +56,25 @@ def main():
 class PatternsManager:
     def __init__(self):
         self.patterns = []
+        self.buttons: List[widgets.Button] = []
+        self.widget = widgets.List(items=self.buttons)
 
     def add_pattern_from_form(self, form):
         self.add_pattern(self.make_pattern_from_form(form))
 
     def make_pattern_from_form(self, form):
-        name = form
+        name = form['name']
         return Pattern(name=name)
 
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
+        self.widget.add_item(widgets.Button(pattern.name))
 
     def delete_pattern(self, pattern):
         self.patterns.remove(pattern)
 
-    def list(self):
-        imgui.begin_child('patterns')
-        imgui.separator()
-        for pattern in self.patterns:
-            imgui.button(pattern.name)
-            imgui.same_line()
-            texture_id = pyglet.resource.texture('cancel.png').id
-            print(texture_id)
-            if imgui.image_button(texture_id, 20, 20):
-                self.delete_pattern(pattern)
-        imgui.end_child()
-
-
-class AddPatternForm:
-    name = ''
-
-    @classmethod
-    def enter(cls):
-        changed, cls.name = imgui.input_text('Enter pattern name', cls.name, 256)
-        if imgui.button('Add pattern'):
-            name = cls.name
-            cls.name = ''
-            return name
-        return None
+    def gui(self):
+        self.widget.gui()
 
 
 if __name__ == "__main__":
