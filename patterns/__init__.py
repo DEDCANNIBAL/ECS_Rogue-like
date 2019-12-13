@@ -12,13 +12,18 @@ class ComponentPattern:
 
 
 @dataclass
-class Pattern:
+class ComponentPattern:
+    component: type
+    kwargs: dict
+
+
+@dataclass
+class EntityPattern:
     name: str
-    component_factories: List[Callable] = field(default_factory=list)
+    component_patterns: List[ComponentPattern] = field(default_factory=list)
 
     def spawn(self, registry: Registry):
-        return registry.create(*[Factory() for Factory in self.component_factories])
-
+        pass
 
 @lru_cache
 def load(name: str):

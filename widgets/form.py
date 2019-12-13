@@ -41,8 +41,8 @@ class Form(Widget):
             return imgui.input_int
         elif field.type is float:
             return imgui.input_float
-        elif field.type is ForeignKey:
-            return partial(imgui.listbox, fitems=field.type.choices)
+        elif isinstance(field.type, ForeignKey):
+            return partial(imgui.listbox, items=field.type.choices)
         else:
             raise NotImplementedError
 
