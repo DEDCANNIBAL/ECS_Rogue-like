@@ -35,7 +35,7 @@ class ImageButton(Button):
         self.callback = callback
         self.width = width
         self.height = height
-        self.texture = texture.get_transform()
+        self.texture = texture
 
     def gui(self):
         if imgui.image_button(self.texture.id, self.width, self.height):

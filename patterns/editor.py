@@ -57,7 +57,10 @@ class PatternsManager:
     def __init__(self):
         self.patterns = []
         self.buttons: List[widgets.Button] = []
-        self.widget = widgets.List(items=self.buttons)
+        self.widget = widgets.List(
+            items=self.buttons,
+            on_remove=lambda index: self.delete_pattern(self.patterns[index])
+        )
 
     def add_pattern_from_form(self, form):
         self.add_pattern(self.make_pattern_from_form(form))
