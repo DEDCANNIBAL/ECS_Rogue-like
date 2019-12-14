@@ -41,7 +41,8 @@ class List(Widget):
             if isinstance(item, Widget):
                 item.gui()
             else:
-                imgui.label_text(getattr(item, 'name', str(item)))
+                text = getattr(item, 'name', str(item))
+                imgui.label_text(text, text)
             imgui.same_line()
             remove_button.gui()
 

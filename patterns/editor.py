@@ -6,7 +6,7 @@ import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
 import widgets
-from patterns import Pattern
+from patterns import EntityPattern
 
 
 def main():
@@ -67,7 +67,7 @@ class PatternsManager:
 
     def make_pattern_from_form(self, form):
         name = form['name']
-        return Pattern(name=name)
+        return EntityPattern(name=name)
 
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
