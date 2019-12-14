@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, Any, List
+from typing import List, Union
 
 import imgui
 
@@ -8,9 +8,30 @@ from widgets.base import Widget
 
 
 @dataclass
+class ForeignKey:
+    def __init__(self, choices: list, name_func=str):
+        self.choices = choices
+        self.names = []
+        self.name_func = name_func
+        self.update_names()
+
+    def update_names(self):
+        if len(self.names) != len(self.choices):
+            self.names = [self.name_func(choice) for choice in self.choices]
+
+    def __call__(self, *args, **kwargs):
+        return self.choices[0]
+
+    def input(self, description, current):
+        index = self.choices.index(current)
+        changed, index = imgui.listbox(description, index, self.names)
+        return changed, self.choices[index]
+
+
+@dataclass
 class FormField:
     key: str
-    type: type
+    type: Union[type, ForeignKey]
     description: str = ''
     default = None
 
@@ -42,7 +63,7 @@ class Form(Widget):
         elif field.type is float:
             return imgui.input_float
         elif isinstance(field.type, ForeignKey):
-            return partial(imgui.listbox, items=field.type.choices)
+            return field.type.input
         else:
             raise NotImplementedError
 
@@ -54,11 +75,3 @@ class Form(Widget):
     @property
     def context(self):
         return {key: value for key, (value, _, _) in self.fields.items()}
-
-
-@dataclass
-class ForeignKey:
-    choices: list
-
-    def __call__(self, *args, **kwargs):
-        return 0

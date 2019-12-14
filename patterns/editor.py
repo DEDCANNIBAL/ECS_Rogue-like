@@ -1,3 +1,5 @@
+from functools import partial
+from operator import attrgetter
 from typing import List
 
 import pyglet
@@ -6,6 +8,7 @@ import imgui
 from imgui.integrations.pyglet import PygletRenderer
 
 import widgets
+import components as _components
 from patterns import EntityPattern
 
 
@@ -17,7 +20,9 @@ def main():
     impl = PygletRenderer(window)
     pyglet.resource.path.append('resources')
 
-    patterns = PatternsManager()
+    components = [component for name in dir(_components) if type(component := getattr(_components, name)) is type]
+
+    patterns_manager = PatternsManager()
 
     add_pattern_button = widgets.ButtonWithPopup(
         'Add pattern',
@@ -30,17 +35,39 @@ def main():
                     description='Pattern name'
                 )]
             ),
-            callback=patterns.add_pattern_from_form,
+            callback=patterns_manager.add_pattern_from_form,
+        ),
+    )
+
+    add_component_button = widgets.ButtonWithPopup(
+        'Add component',
+        popup=widgets.FormPopup(
+            'Add component',
+            form=widgets.Form(
+                [widgets.FormField(
+                    'component',
+                    widgets.ForeignKey(choices=components, name_func=attrgetter('__name__')),
+                    description='Choose component'
+                )]
+            ),
+            callback=print,
         ),
     )
 
     def update(dt):
         imgui.new_frame()
+
         imgui.begin('Patterns')
         add_pattern_button.gui()
-        patterns.gui()
-
+        patterns_manager.gui()
         imgui.end()
+
+        if patterns_manager.current_components_manager is not None:
+            imgui.begin('Components')
+            add_component_button.gui()
+            patterns_manager.current_components_manager.gui()
+            imgui.end()
+
 
     @window.event
     def on_draw():
@@ -61,6 +88,8 @@ class PatternsManager:
             items=self.buttons,
             on_remove=lambda index: self.delete_pattern(self.patterns[index])
         )
+        self.components_managers = []
+        self.current_components_manager = None
 
     def add_pattern_from_form(self, form):
         self.add_pattern(self.make_pattern_from_form(form))
@@ -71,10 +100,29 @@ class PatternsManager:
 
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
-        self.widget.add_item(widgets.Button(pattern.name))
+        self.set_current_components_manager(ComponentsManager())
+        self.components_managers.append(self.current_components_manager)
+        self.widget.add_item(widgets.Button(
+            pattern.name,
+            callback=partial(self.set_current_components_manager, self.current_components_manager)
+        ))
+
+    def set_current_components_manager(self, components_manager):
+        self.current_components_manager = components_manager
 
     def delete_pattern(self, pattern):
         self.patterns.remove(pattern)
+
+    def gui(self):
+        self.widget.gui()
+
+
+class ComponentsManager:
+    def __init__(self):
+        self.forms: List[widgets.Form] = []
+        self.widget = widgets.List(
+            items=self.forms,
+        )
 
     def gui(self):
         self.widget.gui()
