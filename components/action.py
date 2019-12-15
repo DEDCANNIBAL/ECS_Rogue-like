@@ -10,6 +10,6 @@ class ActionType(Enum):
 
 @dataclass
 class Action:
-    type: ActionType
-    delta: Position = None
-    position: Position = None
+    type: ActionType = ActionType.MOVE
+    delta: Position = Position()
+    position: Position = Position()

@@ -7,7 +7,8 @@ from components import Position
 class GoalType(Enum):
     MOVE = auto()
 
+
 @dataclass
 class Goal:
-    type: GoalType
+    type: GoalType = GoalType.MOVE
     position: Position = None

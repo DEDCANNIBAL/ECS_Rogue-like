@@ -1,15 +1,16 @@
 from dataclasses import dataclass
+from enum import Enum
 from functools import partial
-from typing import List, Union, Any
+from operator import attrgetter
+from typing import List, Union, Any, Callable
 
 import imgui
 
 from widgets.base import Widget
 
 
-@dataclass
 class ForeignKey:
-    def __init__(self, choices: list, name_func=str):
+    def __init__(self, choices: list, name_func: Callable[[Any], str]=str):
         self.choices = choices
         self.names = []
         self.name_func = name_func
@@ -26,6 +27,12 @@ class ForeignKey:
         index = self.choices.index(current)
         changed, index = imgui.listbox(description, index, self.names)
         return changed, self.choices[index]
+
+
+class EnumKey(ForeignKey):
+    def __init__(self, enum):
+        members = [value for _, value in enum.__members__.items()]
+        super().__init__(members, name_func=attrgetter('name'))
 
 
 @dataclass
@@ -66,8 +73,10 @@ class Form(Widget):
             return imgui.checkbox
         elif isinstance(field.type, ForeignKey):
             return field.type.input
+        elif field.type.__base__ is Enum:
+            return EnumKey(field.type).input
         else:
-            raise NotImplementedError
+            return lambda label, value: (False, value)
 
     def gui(self):
         if self.name:
