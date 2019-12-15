@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import List, Union
+from typing import List, Union, Any
 
 import imgui
 
@@ -33,7 +33,7 @@ class FormField:
     key: str
     type: Union[type, ForeignKey]
     description: str = ''
-    default = None
+    default: Any = None
 
 
 @dataclass
@@ -62,12 +62,16 @@ class Form(Widget):
             return imgui.input_int
         elif field.type is float:
             return imgui.input_float
+        elif field.type is bool:
+            return imgui.checkbox
         elif isinstance(field.type, ForeignKey):
             return field.type.input
         else:
             raise NotImplementedError
 
     def gui(self):
+        if self.name:
+            imgui.text(self.name)
         for key, (current, input_func, description) in self.fields.items():
             changed, current = input_func(description, current)
             self.fields[key][0] = current

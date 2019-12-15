@@ -7,7 +7,7 @@ from libc.math cimport sqrt
 cdef class vec2i:
     cdef public int x, y
 
-    def __init__(self, int x, int y):
+    def __init__(self, int x=0, int y=0):
         self.x = x
         self.y = y
 

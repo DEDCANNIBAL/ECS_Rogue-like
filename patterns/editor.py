@@ -1,6 +1,6 @@
 from functools import partial
 from operator import attrgetter
-from typing import List
+from typing import List, Optional
 
 import pyglet
 from pyglet import gl
@@ -9,7 +9,7 @@ from imgui.integrations.pyglet import PygletRenderer
 
 import widgets
 import components as _components
-from patterns import EntityPattern
+from patterns import EntityPattern, ComponentPattern
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
                     description='Choose component'
                 )]
             ),
-            callback=print,
+            callback=lambda form: patterns_manager.current_components_manager.add_component_from_form(form),
         ),
     )
 
@@ -67,7 +67,6 @@ def main():
             add_component_button.gui()
             patterns_manager.current_components_manager.gui()
             imgui.end()
-
 
     @window.event
     def on_draw():
@@ -88,8 +87,8 @@ class PatternsManager:
             items=self.buttons,
             on_remove=lambda index: self.delete_pattern(self.patterns[index])
         )
-        self.components_managers = []
-        self.current_components_manager = None
+        self.components_managers: List[ComponentsManager] = []
+        self.current_components_manager: Optional[ComponentsManager] = None
 
     def add_pattern_from_form(self, form):
         self.add_pattern(self.make_pattern_from_form(form))
@@ -119,6 +118,7 @@ class PatternsManager:
 
 class ComponentsManager:
     def __init__(self):
+        self.components = []
         self.forms: List[widgets.Form] = []
         self.widget = widgets.List(
             items=self.forms,
@@ -126,6 +126,23 @@ class ComponentsManager:
 
     def gui(self):
         self.widget.gui()
+
+    def add_component_from_form(self, form):
+        self.add_component(self.make_component_from_form(form))
+
+    def make_component_from_form(self, form):
+        component = form['component']
+        return ComponentPattern(component)
+
+    def add_component(self, pattern: ComponentPattern):
+        self.components.append(pattern)
+        self.widget.add_item(widgets.Form(
+            fields=[
+                widgets.FormField(key, type(default), default=default)
+                for key, default in pattern.kwargs.items()
+            ],
+            name=pattern.component.__name__,
+        ))
 
 
 if __name__ == "__main__":

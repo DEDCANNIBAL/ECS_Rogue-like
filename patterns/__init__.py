@@ -1,20 +1,16 @@
+import inspect
+from copy import copy
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import List, Callable
+from typing import List
 
 from ecs import Registry
 
 
-@dataclass
 class ComponentPattern:
-    component: type
-    args: dict
-
-
-@dataclass
-class ComponentPattern:
-    component: type
-    kwargs: dict
+    def __init__(self, component: type):
+        self.component = component
+        self.kwargs = {key: value for key, value in inspect.getmembers(component()) if not key.startswith('__')}
 
 
 @dataclass
@@ -24,6 +20,7 @@ class EntityPattern:
 
     def spawn(self, registry: Registry):
         pass
+
 
 @lru_cache
 def load(name: str):
