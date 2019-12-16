@@ -1,3 +1,4 @@
+import inspect
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -43,10 +44,7 @@ class FormField:
     default: Any = None
 
 
-@dataclass
 class Form(Widget):
-    name: str = ''
-
     def __init__(self, fields: List[FormField], name: str = ''):
         self.name = name
         self.form_fields = fields
@@ -59,10 +57,11 @@ class Form(Widget):
             default = field.type() if field.default is None else field.default
             input_func = self.get_input_func(field)
             description = field.description or field.key
+            if self.name:
+                description = self.name + '.' + description
             self.fields[field.key] = [default, input_func, description]
 
-    @staticmethod
-    def get_input_func(field: FormField):
+    def get_input_func(self, field: FormField):
         if field.type is str:
             return partial(imgui.input_text, buffer_length=256)
         elif field.type is int:
@@ -76,15 +75,32 @@ class Form(Widget):
         elif field.type.__base__ is Enum:
             return EnumKey(field.type).input
         else:
-            return lambda label, value: (False, value)
+            subform = ObjectForm(field.type, name=self.name + '.' + field.key)
+            return subform.input
 
     def gui(self):
         if self.name:
             imgui.text(self.name)
+            imgui.indent(20)
         for key, (current, input_func, description) in self.fields.items():
             changed, current = input_func(description, current)
             self.fields[key][0] = current
+        if self.name:
+            imgui.unindent(20)
+
+    def input(self, label, value):
+        self.gui()
+        return False, None
 
     @property
     def context(self):
         return {key: value for key, (value, _, _) in self.fields.items()}
+
+
+class ObjectForm(Form):
+    def __init__(self, cls, name: str = ''):
+        fields = [FormField(key, type(default), default=default)
+                  for key, default in inspect.getmembers(cls()) if not key.startswith('__')]
+        if not name:
+            name = cls.__name__
+        super().__init__(fields, name)

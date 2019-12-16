@@ -11,4 +11,4 @@ class GoalType(Enum):
 @dataclass
 class Goal:
     type: GoalType = GoalType.MOVE
-    position: Position = None
+    position: Position = Position()

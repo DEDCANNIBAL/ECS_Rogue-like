@@ -10,7 +10,7 @@ from ecs import Registry
 class ComponentPattern:
     def __init__(self, component: type):
         self.component = component
-        self.kwargs = {key: value for key, value in inspect.getmembers(component()) if not key.startswith('__')}
+        self.kwargs = {}
 
 
 @dataclass

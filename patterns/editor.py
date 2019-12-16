@@ -136,13 +136,7 @@ class ComponentsManager:
 
     def add_component(self, pattern: ComponentPattern):
         self.components.append(pattern)
-        self.widget.add_item(widgets.Form(
-            fields=[
-                widgets.FormField(key, type(default), default=default)
-                for key, default in pattern.kwargs.items()
-            ],
-            name=pattern.component.__name__,
-        ))
+        self.widget.add_item(widgets.ObjectForm(pattern.component))
 
 
 if __name__ == "__main__":
