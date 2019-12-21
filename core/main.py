@@ -54,6 +54,7 @@ def make_system_manager(pubsub, registry):
         systems.MakeActionSystem,
         systems.MakeTurnSystem,
         systems.DebugSystem,
+        systems.FieldGenerationSystem,
     ):
         system_manager.add_system(system)
 

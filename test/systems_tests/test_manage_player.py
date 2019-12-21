@@ -6,6 +6,10 @@ from .base import TestSystem
 class TestManagePlayerSystem(TestSystem):
     system = ManagePlayerSystem
 
+    def setUp(self):
+        super().setUp()
+        self.system.init()
+
     def test_init_creates_player(self):
         player = self.registry.get(self.system.player_entity, Player)
         self.assertIsNotNone(player)

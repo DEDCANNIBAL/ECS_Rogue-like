@@ -12,4 +12,3 @@ class TestSystem(unittest.TestCase):
         self.pubsub = ecs.PubSub()
         self.pubsub_view = PubSubView(self.pubsub)
         self.system = self.system(registry=self.registry, pubsub=self.pubsub)
-        self.system.init()

@@ -8,6 +8,10 @@ from .base import TestSystem
 class TestMakeTurnSystem(TestSystem):
     system = MakeTurnSystem
 
+    def setUp(self):
+        super().setUp()
+        self.system.init()
+
     def test_one_turn_without_player(self):
         self.system.non_player_turn = MagicMock()
         entity1 = self.registry.create(Actable)
@@ -36,5 +40,3 @@ class TestMakeTurnSystem(TestSystem):
         self.assertEqual(next(self.pubsub_view.unit_acted), entity)
         self.assertEqual(next(self.pubsub_view.turns), turn_number)
         self.assertEqual(self.system.turn_number, turn_number + 1)
-
-

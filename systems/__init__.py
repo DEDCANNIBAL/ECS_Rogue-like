@@ -4,3 +4,4 @@ from .make_order_system import MakeOrderSystem
 from .manage_player_system import ManagePlayerSystem
 from .make_player_goal_system import MakePlayerGoalSystem
 from .make_action_system import MakeActionSystem
+from .field_generation_system import FieldGenerationSystem
