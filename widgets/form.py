@@ -45,11 +45,12 @@ class FormField:
 
 
 class Form(Widget):
-    def __init__(self, fields: List[FormField], name: str = ''):
+    def __init__(self, fields: List[FormField], name: str = '', on_change=lambda key, value: None):
         self.name = name
         self.form_fields = fields
         self.fields = {}
         self.init()
+        self.on_change = on_change
 
     def init(self):
         self.fields = {}
@@ -84,6 +85,8 @@ class Form(Widget):
             imgui.indent(20)
         for key, (current, input_func, description) in self.fields.items():
             changed, current = input_func(description, current)
+            if changed:
+                self.on_change(key, current)
             self.fields[key][0] = current
         if self.name:
             imgui.unindent(20)
