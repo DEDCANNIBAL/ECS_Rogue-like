@@ -1,4 +1,5 @@
 import inspect
+from contextlib import nullcontext
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -7,11 +8,12 @@ from typing import List, Union, Any, Callable
 
 import imgui
 
+from widgets.utils import indent
 from widgets.base import Widget
 
 
 class ForeignKey:
-    def __init__(self, choices: list, name_func: Callable[[Any], str]=str):
+    def __init__(self, choices: list, name_func: Callable[[Any], str] = str):
         self.choices = choices
         self.names = []
         self.name_func = name_func
@@ -82,14 +84,15 @@ class Form(Widget):
     def gui(self):
         if self.name:
             imgui.text(self.name)
-            imgui.indent(20)
-        for key, (current, input_func, description) in self.fields.items():
-            changed, current = input_func(description, current)
-            if changed:
-                self.on_change(key, current)
-            self.fields[key][0] = current
-        if self.name:
-            imgui.unindent(20)
+            context = indent(20)
+        else:
+            context = nullcontext()
+        with context:
+            for key, (current, input_func, description) in self.fields.items():
+                changed, current = input_func(description, current)
+                if changed:
+                    self.on_change(key, current)
+                self.fields[key][0] = current
 
     def input(self, label, value):
         self.gui()
