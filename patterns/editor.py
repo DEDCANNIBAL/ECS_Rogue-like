@@ -1,4 +1,4 @@
-from functools import partial
+from functools import partial, singledispatchmethod
 from operator import attrgetter
 from typing import List, Optional
 
@@ -20,7 +20,8 @@ def main():
     impl = PygletRenderer(window)
     pyglet.resource.path.append('resources')
 
-    components = [component for name in dir(_components) if type(component := getattr(_components, name)) is type]
+    components = [component for name in dir(_components)
+                  if type(component := getattr(_components, name)) is type]
 
     patterns_manager = PatternsManager()
 
@@ -46,7 +47,10 @@ def main():
             form=widgets.Form(
                 [widgets.FormField(
                     'component',
-                    widgets.ForeignKey(choices=components, name_func=attrgetter('__name__')),
+                    widgets.ForeignKey(
+                        choices=components,
+                        name_func=attrgetter('__name__')
+                    ),
                     description='Choose component'
                 )]
             ),
@@ -99,30 +103,38 @@ class PatternsManager:
 
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
-        self.set_current_components_manager(ComponentsManager())
-        self.components_managers.append(self.current_components_manager)
+        components_manager = ComponentsManager(pattern)
+        self.set_current_components_manager(components_manager)
+        self.components_managers.append(components_manager)
         self.widget.add_item(widgets.Button(
             pattern.name,
-            callback=partial(self.set_current_components_manager, self.current_components_manager)
+            callback=partial(
+                self.set_current_components_manager,
+                components_manager
+            )
         ))
 
     def set_current_components_manager(self, components_manager):
         self.current_components_manager = components_manager
 
-    def delete_pattern(self, pattern):
+    def delete_pattern(self, pattern: EntityPattern):
         self.patterns.remove(pattern)
+        pattern.delete()
 
     def gui(self):
         self.widget.gui()
 
 
 class ComponentsManager:
-    def __init__(self):
+    def __init__(self, entity_pattern: EntityPattern):
+        self.entity_pattern = entity_pattern
         self.components = []
         self.forms: List[widgets.Form] = []
         self.widget = widgets.List(
             items=self.forms,
+            on_remove=self.delete_component,
         )
+        self.save()
 
     def gui(self):
         self.widget.gui()
@@ -136,7 +148,28 @@ class ComponentsManager:
 
     def add_component(self, pattern: ComponentPattern):
         self.components.append(pattern)
-        self.widget.add_item(widgets.ObjectForm(pattern.component))
+        self.entity_pattern.component_patterns.append(pattern)
+        self.widget.add_item(widgets.ObjectForm(
+            pattern.component,
+            on_change=partial(self.update_component_field, pattern)
+        ))
+
+    @singledispatchmethod
+    def delete_component(self, pattern: ComponentPattern):
+        self.components.remove(pattern)
+        self.entity_pattern.component_patterns.remove(pattern)
+        self.save()
+
+    @delete_component.register
+    def _(self, index: int):
+        self.delete_component(self.components[index])
+
+    def update_component_field(self, pattern, key, value):
+        pattern.kwargs[key] = value
+        self.save()
+
+    def save(self):
+        self.entity_pattern.save()
 
 
 if __name__ == "__main__":

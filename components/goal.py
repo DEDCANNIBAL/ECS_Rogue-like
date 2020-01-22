@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from components import Position
@@ -11,4 +11,4 @@ class GoalType(Enum):
 @dataclass
 class Goal:
     type: GoalType = GoalType.MOVE
-    position: Position = Position()
+    position: Position = field(default_factory=Position)

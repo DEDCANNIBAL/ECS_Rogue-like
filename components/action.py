@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from components import Position
@@ -11,5 +11,5 @@ class ActionType(Enum):
 @dataclass
 class Action:
     type: ActionType = ActionType.MOVE
-    delta: Position = Position()
-    position: Position = Position()
+    delta: Position = field(default_factory=Position)
+    position: Position = field(default_factory=Position)

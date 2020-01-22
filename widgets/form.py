@@ -47,12 +47,15 @@ class FormField:
 
 
 class Form(Widget):
-    def __init__(self, fields: List[FormField], name: str = '', on_change=lambda key, value: None):
+    def __init__(self,
+                 fields: List[FormField],
+                 name: str = '',
+                 on_change=lambda key, value: None):
         self.name = name
         self.form_fields = fields
         self.fields = {}
-        self.init()
         self.on_change = on_change
+        self.init()
 
     def init(self):
         self.fields = {}
@@ -63,6 +66,7 @@ class Form(Widget):
             if self.name:
                 description = self.name + '.' + description
             self.fields[field.key] = [default, input_func, description]
+            self.on_change(field.key, default)
 
     def get_input_func(self, field: FormField):
         if field.type is str:
@@ -78,7 +82,10 @@ class Form(Widget):
         elif field.type.__base__ is Enum:
             return EnumKey(field.type).input
         else:
-            subform = ObjectForm(field.type, name=self.name + '.' + field.key)
+            subform = ObjectForm(
+                field.type,
+                name=self.name + '.' + field.key,
+            )
             return subform.input
 
     def gui(self):
@@ -88,15 +95,14 @@ class Form(Widget):
         else:
             context = nullcontext()
         with context:
+            any_changed = False
             for key, (current, input_func, description) in self.fields.items():
                 changed, current = input_func(description, current)
                 if changed:
+                    any_changed = True
                     self.on_change(key, current)
                 self.fields[key][0] = current
-
-    def input(self, label, value):
-        self.gui()
-        return False, None
+            return any_changed
 
     @property
     def context(self):
@@ -104,9 +110,19 @@ class Form(Widget):
 
 
 class ObjectForm(Form):
-    def __init__(self, cls, name: str = ''):
+    def __init__(self, cls, name: str = '', *args, **kwargs):
         fields = [FormField(key, type(default), default=default)
-                  for key, default in inspect.getmembers(cls()) if not key.startswith('__')]
+                  for key, default in inspect.getmembers(cls())
+                  if not key.startswith('__')]
         if not name:
             name = cls.__name__
-        super().__init__(fields, name)
+        self.cls = cls
+        super().__init__(fields, name, *args, **kwargs)
+
+    @property
+    def object(self):
+        return self.cls(**self.context)
+
+    def input(self, label, value):
+        changed = self.gui()
+        return changed, self.object
