@@ -9,7 +9,7 @@ from imgui.integrations.pyglet import PygletRenderer
 
 import widgets
 import components as _components
-from patterns import EntityPattern, ComponentPattern
+from patterns import EntityPattern, ComponentPattern, PATH_TO_PATTERNS, load
 
 
 def main():
@@ -58,19 +58,26 @@ def main():
         ),
     )
 
-    def update(dt):
-        imgui.new_frame()
-
+    def entities_gui():
         imgui.begin('Patterns')
         add_pattern_button.gui()
         patterns_manager.gui()
         imgui.end()
 
+    def components_gui():
+        current_components_manager = patterns_manager.current_components_manager
         if patterns_manager.current_components_manager is not None:
             imgui.begin('Components')
+            imgui.text(current_components_manager.entity_pattern.name)
             add_component_button.gui()
-            patterns_manager.current_components_manager.gui()
+            current_components_manager.gui()
             imgui.end()
+
+    def update(dt):
+        imgui.new_frame()
+        entities_gui()
+        components_gui()
+
 
     @window.event
     def on_draw():
@@ -93,6 +100,7 @@ class PatternsManager:
         )
         self.components_managers: List[ComponentsManager] = []
         self.current_components_manager: Optional[ComponentsManager] = None
+        self.load()
 
     def add_pattern_from_form(self, form):
         self.add_pattern(self.make_pattern_from_form(form))
@@ -114,10 +122,18 @@ class PatternsManager:
             )
         ))
 
+    def load(self):
+        for pattern_path in PATH_TO_PATTERNS.iterdir():
+            pattern = load(pattern_path.name)
+            self.add_pattern(pattern)
+
     def set_current_components_manager(self, components_manager):
         self.current_components_manager = components_manager
 
     def delete_pattern(self, pattern: EntityPattern):
+        current_components_manager = self.current_components_manager
+        if current_components_manager is not None and current_components_manager.entity_pattern is pattern:
+            self.current_components_manager = None
         self.patterns.remove(pattern)
         pattern.delete()
 
@@ -128,13 +144,18 @@ class PatternsManager:
 class ComponentsManager:
     def __init__(self, entity_pattern: EntityPattern):
         self.entity_pattern = entity_pattern
-        self.components = []
+        self.components = entity_pattern.component_patterns
         self.forms: List[widgets.Form] = []
         self.widget = widgets.List(
             items=self.forms,
             on_remove=self.delete_component,
         )
+        self.load()
         self.save()
+
+    def load(self):
+        for component in self.entity_pattern.component_patterns:
+            self.add_button_for_component(component)
 
     def gui(self):
         self.widget.gui()
@@ -147,8 +168,10 @@ class ComponentsManager:
         return ComponentPattern(component)
 
     def add_component(self, pattern: ComponentPattern):
-        self.components.append(pattern)
         self.entity_pattern.component_patterns.append(pattern)
+        self.add_button_for_component(pattern)
+
+    def add_button_for_component(self, pattern: ComponentPattern):
         self.widget.add_item(widgets.ObjectForm(
             pattern.component,
             on_change=partial(self.update_component_field, pattern)
@@ -156,7 +179,6 @@ class ComponentsManager:
 
     @singledispatchmethod
     def delete_component(self, pattern: ComponentPattern):
-        self.components.remove(pattern)
         self.entity_pattern.component_patterns.remove(pattern)
         self.save()
 

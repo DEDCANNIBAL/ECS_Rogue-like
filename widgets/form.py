@@ -111,8 +111,9 @@ class Form(Widget):
 
 class ObjectForm(Form):
     def __init__(self, cls, name: str = '', *args, **kwargs):
+        obj = cls() if isinstance(cls, type) else cls
         fields = [FormField(key, type(default), default=default)
-                  for key, default in inspect.getmembers(cls())
+                  for key, default in inspect.getmembers(obj)
                   if not key.startswith('__')]
         if not name:
             name = cls.__name__
