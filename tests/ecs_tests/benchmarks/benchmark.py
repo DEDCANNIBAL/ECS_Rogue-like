@@ -1,6 +1,6 @@
 from timeit import timeit
 
-from test.ecs_tests.benchmarks import test_esc as escpp
+from tests.ecs_tests.benchmarks import test_esc as escpp
 
 N = 20
 

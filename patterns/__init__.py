@@ -16,10 +16,10 @@ from ecs import Registry
 PATH_TO_PATTERNS = Path('patterns') / 'patterns'
 
 
+@dataclass
 class ComponentPattern:
-    def __init__(self, component: type):
-        self.component = component
-        self.kwargs = {}
+    component: type
+    kwargs: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -28,7 +28,11 @@ class EntityPattern:
     component_patterns: List[ComponentPattern] = field(default_factory=list)
 
     def spawn(self, registry: Registry):
-        pass
+        components = (
+            component_pattern.component(**component_pattern.kwargs)
+            for component_pattern in self.component_patterns
+        )
+        return registry.create(*components), *components
 
     def save(self):
         serialized_pattern = yaml.dump(self, Dumper=Dumper)
