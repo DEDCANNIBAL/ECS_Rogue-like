@@ -2,7 +2,7 @@ import unittest
 
 import ecs
 from patterns import EntityPattern, ComponentPattern, load
-from tests.ecs_tests.components import Health, Point
+from test.ecs_tests.components import Health, Point
 
 
 class TestPatterns(unittest.TestCase):
