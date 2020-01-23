@@ -27,4 +27,4 @@ jobs:
     - name: Test with unittests
       run: |
         python build.py build_ext --inplace
-        python -m unittest discover -s test
+        python -m unittest discover
