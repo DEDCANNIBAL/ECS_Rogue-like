@@ -28,10 +28,10 @@ class EntityPattern:
     component_patterns: List[ComponentPattern] = field(default_factory=list)
 
     def spawn(self, registry: Registry):
-        components = (
+        components = [
             component_pattern.component(**component_pattern.kwargs)
             for component_pattern in self.component_patterns
-        )
+        ]
         return registry.create(*components), *components
 
     def save(self):

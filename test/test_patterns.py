@@ -29,3 +29,10 @@ class TestPatterns(unittest.TestCase):
             list(self.registry.get(entity, Point, Health)),
             [Point(2, 0), Health(4)]
         )
+
+    def test_spawn_returned_component(self):
+        entity_pattern = EntityPattern(self.name, component_patterns=[
+            ComponentPattern(Health, {'value': 4}),
+        ])
+        _, health = entity_pattern.spawn(self.registry)
+        self.assertEqual(health, Health(4))
