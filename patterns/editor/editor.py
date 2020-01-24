@@ -71,6 +71,7 @@ class Editor:
         self.entities_gui()
         self.components_gui()
 
+
 def main():
     #  Initialization
     window = pyglet.window.Window(width=1280, height=720, resizable=True)
