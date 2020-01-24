@@ -18,6 +18,7 @@ class TestPatterns(unittest.TestCase):
         entity_pattern.save()
         entity_pattern_loaded = load(self.name)
         self.assertEqual(entity_pattern, entity_pattern_loaded)
+        entity_pattern_loaded.delete()
 
     def test_spawn(self):
         entity_pattern = EntityPattern(self.name, component_patterns=[

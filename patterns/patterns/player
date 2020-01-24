@@ -1,3 +1,6 @@
 !!python/object:patterns.EntityPattern
-component_patterns: []
+component_patterns:
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.player.Player 
+  kwargs: {}
 name: player

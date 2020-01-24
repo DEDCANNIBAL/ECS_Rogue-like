@@ -44,7 +44,7 @@ class EntityPattern:
 
 
 @lru_cache
-def load(name: str):
+def load(name: str) -> EntityPattern:
     with (PATH_TO_PATTERNS / name).open() as file:
         serialized = file.read()
         return yaml.load(serialized, Loader=Loader)
