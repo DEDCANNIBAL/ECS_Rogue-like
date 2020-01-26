@@ -5,8 +5,7 @@ import imgui
 
 @contextmanager
 def indent(width):
-    imgui.indent(width)
     try:
-        yield
+        yield imgui.indent(width)
     finally:
         imgui.unindent(width)
