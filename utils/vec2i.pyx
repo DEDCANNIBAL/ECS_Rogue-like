@@ -7,7 +7,7 @@ from libc.math cimport sqrt
 cdef class vec2i:
     cdef public int x, y
 
-    def __init__(self, int x, int y):
+    def __init__(self, int x=0, int y=0):
         self.x = x
         self.y = y
 
@@ -15,16 +15,16 @@ cdef class vec2i:
         return sqrt(self.x ** 2 + self.y ** 2)
 
     def __add__(vec2i self, vec2i other):
-        return vec2i(self.x + other.x, self.y + other.y)
+        return type(self)(self.x + other.x, self.y + other.y)
 
     def __sub__(vec2i self, vec2i other):
-        return vec2i(self.x - other.x, self.y - other.y)
+        return type(self)(self.x - other.x, self.y - other.y)
 
     def __mul__(vec2i self, int other):
-        return vec2i(self.x * other, self.y * other)
+        return type(self)(self.x * other, self.y * other)
 
     def __floordiv__(vec2i self, int other):
-        return vec2i(self.x // other, self.y // other)
+        return type(self)(self.x // other, self.y // other)
 
     def __eq__(vec2i self, vec2i other):
         return self.x == other.x and self.y == other.y

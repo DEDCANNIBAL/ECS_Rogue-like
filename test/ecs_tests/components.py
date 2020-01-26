@@ -9,4 +9,4 @@ class Point:
 
 @dataclass(unsafe_hash=True)
 class Health:
-    value : int = 10
+    value: int = 10
