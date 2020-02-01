@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from functools import partial
-from typing import List, Callable, Any
+import typing
 
 import imgui
 import pyglet
@@ -14,8 +14,8 @@ class List(Widget):
     name: str = 'List'
     items: list = field(default_factory=list)
     allow_removing: bool = False
-    on_remove: Callable[[int], Any] = lambda index: None
-    remove_buttons: List[ImageButton] = field(default_factory=list)
+    on_remove: typing.Callable[[int], typing.Any] = lambda index: None
+    remove_buttons: typing.List[ImageButton] = field(default_factory=list)
 
     def add_item(self, item):
         self.items.append(item)

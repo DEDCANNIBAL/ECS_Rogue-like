@@ -11,7 +11,7 @@ from widgets.popup import Popup
 @dataclass
 class Button(Widget):
     name: str = 'Button'
-    callback: Callable = lambda: None
+    callback: Callable[[], None] = lambda: None
 
     def gui(self):
         if imgui.button(self.name):
@@ -30,8 +30,8 @@ class ButtonWithPopup(Widget):
         self.popup.gui()
 
 
-class ImageButton(Button):
-    def __init__(self, texture: pyglet.image.Texture, callback=lambda: None, width=15, height=15):
+class ImageButton(Widget):
+    def __init__(self, texture: pyglet.image.Texture, callback: Callable[[], None] = lambda: None, width=15, height=15):
         self.callback = callback
         self.width = width
         self.height = height

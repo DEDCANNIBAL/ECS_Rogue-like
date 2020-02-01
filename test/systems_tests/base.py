@@ -1,11 +1,12 @@
 import unittest
+from typing import Optional
 
 import ecs
-from ecs import PubSubView
+from ecs import PubSubView, System
 
 
 class TestSystem(unittest.TestCase):
-    system = None
+    system: Optional[System] = None
 
     def setUp(self):
         self.registry = ecs.Registry()

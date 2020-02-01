@@ -1,4 +1,4 @@
-from functools import partial, singledispatchmethod
+from functools import partial, singledispatchmethod  # type: ignore
 from typing import List
 
 import widgets
