@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from operator import attrgetter
-from typing import List, Union, Any, Callable
+from typing import List, Union, Any, Callable, Dict, Tuple
 
 import imgui
 
@@ -15,7 +15,7 @@ from widgets.base import Widget
 class ForeignKey:
     def __init__(self, choices: list, name_func: Callable[[Any], str] = str):
         self.choices = choices
-        self.names = []
+        self.names: List[str] = []
         self.name_func = name_func
         self.update_names()
 
@@ -53,7 +53,7 @@ class Form(Widget):
                  on_change=lambda key, value: None):
         self.name = name
         self.form_fields = fields
-        self.fields = {}
+        self.fields: Dict[str, Tuple[Any, Callable, str]] = {}
         self.on_change = on_change
         self.init()
 
