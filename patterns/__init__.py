@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List
 
 import yaml
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -27,12 +28,14 @@ class EntityPattern:
     name: str
     component_patterns: List[ComponentPattern] = field(default_factory=list)
 
-    def spawn(self, registry: Registry):
+    def spawn(self, registry: Registry, *replacing_components):
+        replacing_components_dict = {type(component): component for component in replacing_components}
         components = [
-            component_pattern.component(**component_pattern.kwargs)
+            replacing_components_dict.get(component_pattern.component,
+                                          component_pattern.component(**component_pattern.kwargs))
             for component_pattern in self.component_patterns
         ]
-        return registry.create(*components), *components
+        return registry.create(*components)
 
     def save(self):
         serialized_pattern = yaml.dump(self, Dumper=Dumper)

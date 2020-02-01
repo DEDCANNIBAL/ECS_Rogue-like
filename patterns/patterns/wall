@@ -1,0 +1,11 @@
+!!python/object:patterns.EntityPattern
+component_patterns:
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.obstacle.Obstacle ''
+  kwargs: {}
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.position.Position ''
+  kwargs:
+    x: 0
+    y: 0
+name: wall

@@ -25,15 +25,19 @@ class TestPatterns(unittest.TestCase):
             ComponentPattern(Point, {'x': 2}),
             ComponentPattern(Health, {'value': 4}),
         ])
-        entity, *_ = entity_pattern.spawn(self.registry)
+        entity = entity_pattern.spawn(self.registry)
         self.assertListEqual(
             list(self.registry.get(entity, Point, Health)),
             [Point(2, 0), Health(4)]
         )
 
-    def test_spawn_returned_component(self):
+    def test_spawn_replace_components(self):
         entity_pattern = EntityPattern(self.name, component_patterns=[
+            ComponentPattern(Point, {'x': 2}),
             ComponentPattern(Health, {'value': 4}),
         ])
-        _, health = entity_pattern.spawn(self.registry)
-        self.assertEqual(health, Health(4))
+        entity = entity_pattern.spawn(self.registry, Health(5))
+        self.assertListEqual(
+            list(self.registry.get(entity, Point, Health)),
+            [Point(2, 0), Health(5)]
+        )

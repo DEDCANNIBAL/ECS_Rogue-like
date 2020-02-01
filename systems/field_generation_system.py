@@ -4,6 +4,7 @@ from math import floor
 from ecs import System
 from components import Obstacle, Position
 from utils.getters import get_field_size
+import patterns
 
 
 class FieldGenerationSystem(System):
@@ -21,7 +22,4 @@ class FieldGenerationSystem(System):
                 self.create_wall(x, y)
 
     def create_wall(self, x: int, y: int):
-        self.registry.create(
-            Obstacle,
-            Position(x, y)
-        )
+        patterns.load('wall').spawn(self.registry, Position(x, y))
