@@ -131,6 +131,9 @@ class ObjectForm(Form):
                 field.default = defaults.get(field.key, field.default)
             return fields
 
+        if defaults is None:
+            defaults = {}
+
         obj = cls() if isinstance(cls, type) else cls
         fields = [FormField(key, type(default), default=defaults.get(key, default))
                   for key, default in inspect.getmembers(obj)
