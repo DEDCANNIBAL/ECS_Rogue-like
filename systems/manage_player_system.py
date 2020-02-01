@@ -1,11 +1,8 @@
-from components import Actable, Position, Player
+import patterns
 from ecs import System
 
 
 class ManagePlayerSystem(System):
     def init(self):
-        self.player_entity = self.registry.create(
-            Actable(is_player=True),
-            Player,
-            Position(0, 0),
-        )
+        player_pattern = patterns.load('player')
+        self.player_entity = player_pattern.spawn(self.registry)

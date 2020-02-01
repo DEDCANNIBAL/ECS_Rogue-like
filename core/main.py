@@ -1,10 +1,11 @@
-import pyglet
-from pyglet import gl
 import imgui
+import pyglet
 from imgui.integrations.pyglet import PygletRenderer
+from pyglet import gl
 
 import systems
 from components import Position
+from components.sprite import batch
 from ecs import SystemManager, Registry, PubSub
 
 
@@ -35,6 +36,7 @@ def main():
 
         window.clear()
         imgui.render()
+        batch.draw()
         impl.render(imgui.get_draw_data())
 
     @window.event
@@ -55,6 +57,7 @@ def make_system_manager(pubsub, registry):
         systems.MakeTurnSystem,
         systems.DebugSystem,
         systems.FieldGenerationSystem,
+        systems.UpdateSpriteSystem,
     ):
         system_manager.add_system(system)
 

@@ -1,6 +1,20 @@
 !!python/object:patterns.EntityPattern
 component_patterns:
 - !!python/object:patterns.ComponentPattern
-  component: !!python/name:components.player.Player 
+  component: !!python/name:components.player.Player ''
   kwargs: {}
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.sprite.Sprite ''
+  kwargs:
+    filename: Hero.png
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.actable.Actable ''
+  kwargs:
+    acted: false
+    is_player: true
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.position.Position ''
+  kwargs:
+    x: 0
+    y: 0
 name: player

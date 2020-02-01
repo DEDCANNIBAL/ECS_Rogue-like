@@ -1,5 +1,6 @@
 import inspect
 from contextlib import nullcontext
+from copy import copy
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -8,8 +9,8 @@ from typing import List, Union, Any, Callable, Dict, Tuple
 
 import imgui
 
-from widgets.utils import indent
 from widgets.base import Widget
+from widgets.utils import indent
 
 
 class ForeignKey:
@@ -110,15 +111,32 @@ class Form(Widget):
 
 
 class ObjectForm(Form):
-    def __init__(self, cls, name: str = '', *args, **kwargs):
-        obj = cls() if isinstance(cls, type) else cls
-        fields = [FormField(key, type(default), default=default)
-                  for key, default in inspect.getmembers(obj)
-                  if not key.startswith('__')]
+    def __init__(self, cls, name: str = '', defaults=None, *args, **kwargs):
+        fields = self.extract_fields(cls, defaults)
+        if not isinstance(cls, type):
+            cls = type(cls)
         if not name:
             name = cls.__name__
         self.cls = cls
         super().__init__(fields, name, *args, **kwargs)
+
+    @staticmethod
+    def extract_fields(cls, defaults):
+        fields: List[FormField] = getattr(cls, '__form_fields__', None)
+        if fields is not None:
+            if defaults is None:
+                return fields
+            fields = copy(fields)
+            for field in fields:
+                field.default = defaults.get(field.key, field.default)
+            return fields
+
+        obj = cls() if isinstance(cls, type) else cls
+        fields = [FormField(key, type(default), default=defaults.get(key, default))
+                  for key, default in inspect.getmembers(obj)
+                  if not key.startswith('__')]
+
+        return fields
 
     @property
     def object(self):

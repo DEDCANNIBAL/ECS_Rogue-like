@@ -39,7 +39,8 @@ class ComponentsManager:
     def add_button_for_component(self, pattern: ComponentPattern):
         self.widget.add_item(widgets.ObjectForm(
             pattern.component,
-            on_change=partial(self.update_component_field, pattern)
+            defaults=pattern.kwargs,
+            on_change=partial(self.update_component_field, pattern),
         ))
 
     @singledispatchmethod
