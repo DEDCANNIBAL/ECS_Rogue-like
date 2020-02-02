@@ -11,4 +11,4 @@ from .position import Position
 if os.environ.get('CI') is None:
     from .sprite import Sprite
 else:
-    from .sprite_ci import Sprite
+    from .sprite_ci import Sprite  # type: ignore
