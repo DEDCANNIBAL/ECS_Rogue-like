@@ -1,3 +1,4 @@
+# distutils: language = c++
 #cython: language_level=3
 import cython
 from libc.math cimport sqrt

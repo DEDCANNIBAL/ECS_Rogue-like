@@ -1,3 +1,4 @@
+# distutils: language = c++
 #cython: language_level=3
 from collections import deque
 from queue import PriorityQueue
