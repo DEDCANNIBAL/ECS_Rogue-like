@@ -8,4 +8,8 @@ component_patterns:
   kwargs:
     x: 0
     y: 0
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.sprite.Sprite ''
+  kwargs:
+    filename: Wall.png
 name: wall

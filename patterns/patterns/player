@@ -15,6 +15,12 @@ component_patterns:
 - !!python/object:patterns.ComponentPattern
   component: !!python/name:components.position.Position ''
   kwargs:
-    x: 0
-    y: 0
+    x: 1
+    y: 1
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.path_information.PathInformation ''
+  kwargs: {}
+- !!python/object:patterns.ComponentPattern
+  component: !!python/name:components.obstacle.Obstacle ''
+  kwargs: {}
 name: player

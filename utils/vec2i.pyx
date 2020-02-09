@@ -1,12 +1,7 @@
 #cython: language_level=3
 import cython
-from libc.math cimport sqrt
 
-
-@cython.freelist(32)
 cdef class vec2i:
-    cdef public int x, y
-
     def __init__(self, int x=0, int y=0):
         self.x = x
         self.y = y
@@ -41,3 +36,22 @@ cdef class vec2i:
 
     def __str__(self):
         return f'{self.x}, {self.y}'
+
+    def __hash__(self):
+        return self.x << 16 ^ self.y
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __lt__(self, other):
+        return self.x < other.x \
+               or self.x == other.y and self.y < other.y
+
+    def __le__(self, other):
+        return self, other or self == other
+
+    def __gt__(self, other):
+        return not self <= other
+
+    def __ge__(self, other):
+        return not self < other
