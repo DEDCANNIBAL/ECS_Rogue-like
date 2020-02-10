@@ -1,10 +1,14 @@
-from components import Position, Goal, GoalType, Action, ActionType
+from components import Position, Goal, GoalType, Action, ActionType, PathInformation
 from systems import MakeActionSystem
 from .base import TestSystem
 
 
 class TestMakeActionSystem(TestSystem):
     system = MakeActionSystem
+
+    def setUp(self):
+        super().setUp()
+        self.system.init()
 
     def test_vertical_move(self):
         self.check_delta(
@@ -15,8 +19,8 @@ class TestMakeActionSystem(TestSystem):
 
     def test_horizontal_move(self):
         self.check_delta(
-            current_position=Position(1, 0),
-            goal_position=Position(-1, 0),
+            current_position=Position(2, 0),
+            goal_position=Position(0, 0),
             expected_delta=Position(-1, 0),
         )
 
@@ -39,6 +43,6 @@ class TestMakeActionSystem(TestSystem):
         entity = self.registry.create(
             Goal(GoalType.MOVE, position=goal_position),
             current_position,
+            PathInformation(),
         )
         return entity
-

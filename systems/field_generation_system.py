@@ -4,7 +4,7 @@ from math import floor
 from ecs import System
 from components import Obstacle, Position
 from settings import WALL_PERCENT
-from utils.getters import get_field_size
+from getters import get_field_size
 import patterns
 
 

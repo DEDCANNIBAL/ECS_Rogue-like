@@ -8,9 +8,8 @@ from libcpp.vector cimport vector
 
 from components import Position
 from utils.vec2i cimport vec2i
-from utils.vec2i import vec2i
 
-cdef int MAX_PATH_LENGTH = 2 ** 32
+cdef int MAX_PATH_LENGTH = 2 ** 30
 
 cdef class PathFinder:
     shifts = (vec2i(1, 0),
@@ -22,6 +21,8 @@ cdef class PathFinder:
         vector[vector[int]] dist
         vec2i start, finish
         vec2i field_size
+        queue
+        obstacles
 
     def __init__(self, vec2i field_size):
         self.field_size = field_size
@@ -53,6 +54,7 @@ cdef class PathFinder:
         for shift in self.shifts:
             adjacent_pos = current_pos + shift
             if (self.check_position(adjacent_pos)
+                    and adjacent_pos not in self.obstacles
                     and self.get_dist_value(adjacent_pos)
                     > self.get_dist_value(current_pos) + 1):
                 self.dist[adjacent_pos.x][adjacent_pos.y] = self.get_dist_value(current_pos) + 1
@@ -68,18 +70,17 @@ cdef class PathFinder:
         return self.dist[pos.x][pos.y]
 
     cpdef int check_position(self, pos: Position):
-        return Position(0, 0) <= pos < self.field_size and pos not in self.obstacles
+        return Position(0, 0) <= pos < self.field_size
 
     def restore_path(self) -> Deque[Position]:
         path = deque()
-        path.append(self.finish)
         current_pos = self.finish
         while (current_pos != self.start):
+            path.append(current_pos)
             for shift in self.shifts:
                 adjacent_pos = current_pos + shift
                 if (self.check_position(adjacent_pos)
                         and self.get_dist_value(adjacent_pos) + 1
                         == self.get_dist_value(current_pos)):
                     current_pos = adjacent_pos
-                    path.append(adjacent_pos)
         return path
