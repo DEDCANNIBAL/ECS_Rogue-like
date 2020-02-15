@@ -75,7 +75,7 @@ cdef class PathFinder:
     def restore_path(self) -> Deque[Position]:
         path = deque()
         current_pos = self.finish
-        while (current_pos != self.start):
+        while current_pos != self.start:
             path.append(current_pos)
             for shift in self.shifts:
                 adjacent_pos = current_pos + shift

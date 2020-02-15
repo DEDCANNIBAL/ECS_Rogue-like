@@ -44,15 +44,18 @@ cdef class vec2i:
     def __ne__(self, other):
         return not self == other
 
-    def __lt__(self, other):
+    def __lt__(vec2i self, vec2i other):
         return self.x < other.x \
-               or self.x == other.y and self.y < other.y
+               and self.y < other.y
 
-    def __le__(self, other):
-        return self, other or self == other
+    def __le__(vec2i self, vec2i other):
+        return self.x <= other.x \
+               and self.y <= other.y
 
-    def __gt__(self, other):
-        return not self <= other
+    def __gt__(vec2i self, vec2i other):
+        return self.x > other.x \
+               and self.y > other.y
 
-    def __ge__(self, other):
-        return not self < other
+    def __ge__(vec2i self, vec2i other):
+        return self.x >= other.x \
+               and self.y >= other.y
